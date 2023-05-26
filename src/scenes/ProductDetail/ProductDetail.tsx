@@ -27,7 +27,6 @@ type ProductProps = NativeStackScreenProps<RootStackParamList, 'ProductDetail'>;
 
 const ProductDetail = ({ navigation, route }: ProductProps) => {
   const { colors } = useTheme();
-  // const [data, setData] = useState<IProduct | null>(null);
   const { id } = route.params;
   const favorites = useAppSelector((state) => state.product.favoriteProducts);
   const cart = useAppSelector((state) => state.product.cartProducts);
@@ -41,7 +40,7 @@ const ProductDetail = ({ navigation, route }: ProductProps) => {
 
   const navigateEdit = () => {
     if (data) {
-      console.log(data.id)
+      console.log(data.id);
       navigation.navigate('EditScreen', { id: data.id });
     }
   };

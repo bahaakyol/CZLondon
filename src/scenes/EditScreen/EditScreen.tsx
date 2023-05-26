@@ -2,7 +2,7 @@ import { useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, SafeAreaView, StyleSheet } from 'react-native';
+import { Platform, SafeAreaView, StyleSheet } from 'react-native';
 
 import { Button, Input } from '../../components';
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
@@ -19,7 +19,6 @@ interface IgetProduct {
 const EditScreen = ({ route, navigation }: ProductProps) => {
   const { id } = route.params;
   const [product, setProduct] = useState<IProduct | null>(null);
-  const [loading, setLoading] = useState(false);
   const { colors } = useTheme();
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState(0);
@@ -80,7 +79,6 @@ const EditScreen = ({ route, navigation }: ProductProps) => {
           category,
         })
         .then((response) => {
-          // console.log('from service', response.data);
           dispatch(
             setProducts(
               products.map((item) =>
@@ -110,7 +108,6 @@ const EditScreen = ({ route, navigation }: ProductProps) => {
         styles.container,
         { backgroundColor: colors.background, marginTop: Platform.OS === 'android' ? 30 : 0 },
       ]}>
-      {loading && <ActivityIndicator size="large" color="red" style={styles.indicator} />}
       {product && (
         <>
           <Input
