@@ -41,6 +41,7 @@ const ProductDetail = ({ navigation, route }: ProductProps) => {
 
   const navigateEdit = () => {
     if (data) {
+      console.log(data.id)
       navigation.navigate('EditScreen', { id: data.id });
     }
   };

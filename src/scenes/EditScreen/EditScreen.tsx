@@ -2,15 +2,19 @@ import { useTheme } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native';
+import { ActivityIndicator, Platform, SafeAreaView, StyleSheet } from 'react-native';
 
 import { Button, Input } from '../../components';
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import { RootStackParamList } from '../../navigation/Navigation';
-import productsService, { API_URL, IProduct, IUpdateProduct } from '../../services/productsService';
+import { API_URL, IProduct, IUpdateProduct } from '../../services/productsService';
 import { setProducts } from '../../store/reducer/productReducer';
 
 type ProductProps = NativeStackScreenProps<RootStackParamList, 'EditScreen'>;
+
+interface IgetProduct {
+  index: number;
+}
 
 const EditScreen = ({ route, navigation }: ProductProps) => {
   const { id } = route.params;
@@ -22,24 +26,24 @@ const EditScreen = ({ route, navigation }: ProductProps) => {
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
   const [category, setCategory] = useState('');
-  const [updatedItem, setUpdatedItem] = useState<IProduct | null>(null);
   const dispatch = useAppDispatch();
   const { products } = useAppSelector((state) => state.product);
 
+  const getProductByIndex = ({ index }: IgetProduct) => {
+    return products[index];
+  };
+
   useEffect(() => {
-    setLoading(true);
-    productsService.getProductById(id).then((res) => {
-      if (res) {
-        setTitle(res.title);
-        setPrice(res.price);
-        setDescription(res.description);
-        setImage(res.image);
-        setCategory(res.category);
-      }
-      setProduct(res);
-      setLoading(false);
-    });
-  }, []);
+    setProduct(getProductByIndex({ index: id - 1 }));
+    console.log('product: ', product);
+    if (product) {
+      setTitle(product.title);
+      setPrice(product.price);
+      setDescription(product.description);
+      setImage(product.image);
+      setCategory(product.category);
+    }
+  }, [product]);
 
   const submitChangesHandler = async () => {
     try {
@@ -76,18 +80,36 @@ const EditScreen = ({ route, navigation }: ProductProps) => {
           category,
         })
         .then((response) => {
-          console.log('from service', response.data);
-          setUpdatedItem(response.data);
-          dispatch(setProducts(products.map((item) => (item.id === id ? response.data : item))));
+          // console.log('from service', response.data);
+          dispatch(
+            setProducts(
+              products.map((item) =>
+                item.id === id
+                  ? {
+                      ...item,
+                      category,
+                      description,
+                      price,
+                      title,
+                      id,
+                      image,
+                    }
+                  : item
+              )
+            )
+          );
         });
     } catch (error) {
       console.error(error);
-      console.log(updatedItem);
     }
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: colors.background, marginTop: Platform.OS === 'android' ? 30 : 0 },
+      ]}>
       {loading && <ActivityIndicator size="large" color="red" style={styles.indicator} />}
       {product && (
         <>

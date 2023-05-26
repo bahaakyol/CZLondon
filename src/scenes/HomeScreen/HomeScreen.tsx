@@ -13,7 +13,7 @@ import {
 
 import { Card } from '../../components';
 import { AuthContext } from '../../context/authContext';
-import { useAppDispatch } from '../../hooks/hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import { RootStackParamList } from '../../navigation/Navigation';
 import productsService, { IProduct } from '../../services/productsService';
 import { setProducts } from '../../store/reducer/productReducer';
@@ -30,6 +30,8 @@ const HomeScreen = ({ navigation }: HomeScreenNavigationProp) => {
   const [loading, setLoading] = useState(false);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
   const dispatch = useAppDispatch();
+  const { products } = useAppSelector((state) => state.product);
+
   useEffect(() => {
     console.log('currentUser:', currentUser);
   }, [currentUser]);
@@ -44,12 +46,15 @@ const HomeScreen = ({ navigation }: HomeScreenNavigationProp) => {
     productsService.getProduct({}).then((res) => {
       setData(res);
       setLoading(false);
+      dispatch(setProducts(res));
     });
   }, []);
 
   useEffect(() => {
-    dispatch(setProducts(data));
-  }, [data]);
+    if (products !== data) {
+      setData(products);
+    }
+  }, [products]);
 
   const navigateCart = () => {
     navigation.navigate('Cart');
